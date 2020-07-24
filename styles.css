@@ -3,16 +3,16 @@ button {
   box-shadow: none;
 }
 button {
-    border: 2px solid transparent;
-    padding: 1em;
+  border: 2px solid transparent;
+  padding: 1em;
 }
-button[disabled=true] {
-    border-color:  rgb(0, 128, 0);
+button[disabled="true"] {
+  border-color: rgb(0, 128, 0);
 }
-button[data-match=false],
-button[data-match=false]:focus {
-    border-color: rgb(244, 54, 6);
+button[data-match="false"],
+button[data-match="false"]:focus {
+  border-color: rgb(244, 54, 6);
 }
 button:focus {
-    border-color: rgb(44, 226, 217);
+  border-color: rgb(44, 226, 217);
 }
