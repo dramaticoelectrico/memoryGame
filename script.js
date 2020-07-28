@@ -17,13 +17,13 @@ class MemoryGame {
     buttons.forEach((button, i) => {
       button.setAttribute("data-name", this.squares[i].name);
       button.setAttribute("id", "item-" + i);
-      button.addEventListener("click", this.handlerClick.bind(this), true);
+      button.addEventListener("click", this.handlerClick.bind(this));
       button.firstElementChild.append(this.squares[i].img);
     });
   }
   handlerClick(e) {
     if (this.lockBoard) return;
-    const parent = e.target.parentNode;
+    const parent = e.currentTarget;
     parent.setAttribute("class", "active");
     this.selection.push({ id: parent.id, name: parent.dataset.name });
     this.checkMatch();
