@@ -13,27 +13,25 @@ class MemoryGame {
     this.buildBoard();
   }
   buildBoard() {
-    let buttons = document.querySelectorAll("button");
+    const buttons = document.querySelectorAll("button");
     buttons.forEach((button, i) => {
       button.setAttribute("data-name", this.squares[i].name);
       button.setAttribute("id", "item-" + i);
-      button.setAttribute(
-        "style",
-        "background: url(" +
-          this.squares[i].img +
-          ") no-repeat; background-size: cover;"
-      );
-      button.addEventListener("click", this.handlerClick.bind(this));
+      button.addEventListener("click", this.handlerClick.bind(this), true);
+      button.firstElementChild.append(this.squares[i].img);
     });
   }
   handlerClick(e) {
     if (this.lockBoard) return;
-    this.selection.push({ id: e.target.id, name: e.target.dataset.name });
+    const parent = e.target.parentNode;
+    parent.setAttribute("class", "active");
+    this.selection.push({ id: parent.id, name: parent.dataset.name });
     this.checkMatch();
   }
   checkMatch() {
     if (this.selection.length === 2) {
       this.attempts++;
+      this.msgAttempts.textContent = this.attempts;
       this.selection[0].name === this.selection[1].name
         ? this.scored()
         : this.lose();
@@ -45,7 +43,6 @@ class MemoryGame {
     for (let item of this.selection) {
       el = document.getElementById(item.id);
       el.setAttribute("disabled", "true");
-      el.setAttribute("data-match", "true");
       el.removeEventListener("click", this.handlerClick);
     }
     this.correct.push(this.selection[0], this.selection[1]);
@@ -60,13 +57,13 @@ class MemoryGame {
 
     for (let item of this.selection) {
       el = document.getElementById(item.id);
-      el.setAttribute("data-match", "false");
+      el.classList.add("failed");
     }
     setTimeout(() => {
       this.lockBoard = false;
       for (let item of this.selection) {
         el = document.getElementById(item.id);
-        el.removeAttribute("data-match");
+        el.removeAttribute("class");
       }
       this.selection.length = 0;
     }, 2000);
@@ -94,7 +91,9 @@ function makeTable(cols, rows) {
       cell.setAttribute("data-col", j);
       cell.setAttribute("role", "gridcell");
       let button = document.createElement("button");
+      let span = document.createElement("span");
       button.textContent = count++;
+      button.appendChild(span);
       cell.appendChild(button);
       tbody.rows[i].appendChild(cell);
     }
@@ -105,22 +104,22 @@ function makeTable(cols, rows) {
 document.getElementById("game").appendChild(makeTable(4, 4));
 
 const data = [
-  { name: "blue", img: "https://via.placeholder.com/150/808080" },
-  { name: "blue", img: "https://via.placeholder.com/150/FF0000" },
-  { name: "red", img: "https://via.placeholder.com/150/FF0000" },
-  { name: "red", img: "https://via.placeholder.com/150/808080" },
-  { name: "green", img: "https://via.placeholder.com/150/008000" },
-  { name: "green", img: "https://via.placeholder.com/150/008000" },
-  { name: "yellow", img: "https://via.placeholder.com/150/808080" },
-  { name: "yellow", img: "https://via.placeholder.com/150/808080" },
-  { name: "black", img: "https://via.placeholder.com/150/000000" },
-  { name: "black", img: "https://via.placeholder.com/150/000000" },
-  { name: "white", img: "https://via.placeholder.com/150/FFFFFF" },
-  { name: "white", img: "https://via.placeholder.com/150/FFFFFF" },
-  { name: "pink", img: "https://via.placeholder.com/150/0000FF" },
-  { name: "pink", img: "https://via.placeholder.com/150/0000FF" },
-  { name: "purple", img: "https://via.placeholder.com/150/808080" },
-  { name: "purple", img: "https://via.placeholder.com/150/808080" },
+  { name: "blue", img: "\u2663" },
+  { name: "blue", img: "\u2663" },
+  { name: "red", img: "\u2664" },
+  { name: "red", img: "\u2664 " },
+  { name: "green", img: "\u2665" },
+  { name: "green", img: "\u2665" },
+  { name: "yellow", img: "\u2666" },
+  { name: "yellow", img: "\u2666" },
+  { name: "black", img: "\u2667" },
+  { name: "black", img: "\u2667" },
+  { name: "white", img: "\u2668" },
+  { name: "white", img: "\u2668" },
+  { name: "pink", img: "\u2744" },
+  { name: "pink", img: "\u2744" },
+  { name: "purple", img: "\u272E" },
+  { name: "purple", img: "\u272E" },
 ];
 
 const game = new MemoryGame({ squares: data, time: 25 });
