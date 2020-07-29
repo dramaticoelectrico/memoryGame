@@ -1,20 +1,35 @@
 class MemoryGame {
-  constructor(options) {
-    this.squares = options.squares;
+  constructor() {
+    this.squares = [];
     this.selection = [];
     this.correct = [];
-    this.attempts = 0;
     this.lockBoard = false;
-    this.timer = options.time;
     this.msgTimer = document.getElementById("timer");
     this.msgAttempts = document.getElementById("attempts");
     this.msgAlert = document.getElementById("messages");
     this.game = document.getElementById("game");
+    this.buttons = this.game.querySelectorAll("button");
+  }
+  start(options) {
+    this.squares = options.squares;
+    this.count = options.time;
+    this.attempts = 0;
+    this.msgAttempts.textContent = this.attempts;
+    this.msgTimer.textContent = this.count;
+    this.reset();
+    this.shuffleBoard();
     this.buildBoard();
+    this.timer();
+  }
+  reset() {
+    this.buttons.forEach((button, i) => {
+      button.removeAttribute("class");
+      button.removeAttribute("disabled");
+      button.firstElementChild.textContent = "";
+    });
   }
   buildBoard() {
-    const buttons = document.querySelectorAll("button");
-    buttons.forEach((button, i) => {
+    this.buttons.forEach((button, i) => {
       button.setAttribute("data-name", this.squares[i].name);
       button.setAttribute("id", "item-" + i);
       button.addEventListener("click", this.handlerClick.bind(this));
@@ -71,7 +86,28 @@ class MemoryGame {
   winner() {
     console.log("Game won");
   }
-  shuffleBoard() {}
+  shuffleBoard() {
+    for (var i = 0; i < this.squares.length; i++) {
+      let swapIndex = Math.floor(Math.random() * this.squares.length);
+      let currSquare = this.squares[i];
+      let squareSwap = this.squares[swapIndex];
+      this.squares[i] = squareSwap;
+      this.squares[swapIndex] = currSquare;
+    }
+    return this.squares;
+  }
+  timer() {
+    this.msgTimer.textContent = this.count.toString();
+    const clock = setInterval(doCountDown.bind(this), 1000);
+    function doCountDown() {
+      this.count--;
+      this.msgTimer.textContent = this.count.toString();
+      if (this.count < 1) {
+        clearInterval(clock);
+        alert("Lose game! Game over");
+      }
+    }
+  }
 }
 function makeTable(cols, rows) {
   const table = document.createElement("table");
@@ -121,5 +157,11 @@ const data = [
   { name: "purple", img: "\u272E" },
   { name: "purple", img: "\u272E" },
 ];
+function memoryGame(config) {
+  const game = new MemoryGame();
+  game.start(config);
+}
 
-const game = new MemoryGame({ squares: data, time: 25 });
+document
+  .getElementById("reset")
+  .addEventListener("click", () => memoryGame({ squares: data, time: 25 }));
