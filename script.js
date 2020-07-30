@@ -1,38 +1,51 @@
 class MemoryGame {
-  constructor() {
-    this.squares = [];
+  constructor(cols, rows, boardId) {
+    this.cols = cols;
+    this.rows = rows;
+    this.game = document.getElementById(boardId);
     this.selection = [];
     this.correct = [];
     this.lockBoard = false;
+
+    this.setBoard();
+
     this.msgTimer = document.getElementById("timer");
     this.msgAttempts = document.getElementById("attempts");
     this.msgAlert = document.getElementById("messages");
-    this.game = document.getElementById("game");
     this.buttons = this.game.querySelectorAll("button");
+    this.handler = this.handlerClick.bind(this);
   }
   start(options) {
+    this.reset();
     this.squares = options.squares;
     this.count = options.time;
     this.attempts = 0;
     this.msgAttempts.textContent = this.attempts;
     this.msgTimer.textContent = this.count;
-    this.reset();
     this.shuffleBoard();
-    this.buildBoard();
+    this.addCards();
     this.timer();
   }
   reset() {
-    this.buttons.forEach((button, i) => {
+    this.buttons.forEach((button) => {
+      button.removeAttribute("id");
+      button.removeAttribute("data-name");
       button.removeAttribute("class");
       button.removeAttribute("disabled");
+      button.removeEventListener("click", this.handler);
       button.firstElementChild.textContent = "";
     });
+    this.squares = [];
+    this.count = 0;
+    this.lockBoard = false;
+    this.selection = [];
+    this.correct = [];
   }
-  buildBoard() {
+  addCards() {
     this.buttons.forEach((button, i) => {
-      button.setAttribute("data-name", this.squares[i].name);
+      button.dataset.name = this.squares[i].name;
       button.setAttribute("id", "item-" + i);
-      button.addEventListener("click", this.handlerClick.bind(this));
+      button.addEventListener("click", this.handler);
       button.firstElementChild.append(this.squares[i].img);
     });
   }
@@ -81,10 +94,10 @@ class MemoryGame {
         el.removeAttribute("class");
       }
       this.selection.length = 0;
-    }, 2000);
+    }, 1000);
   }
   winner() {
-    console.log("Game won");
+    alert("Game won");
   }
   shuffleBoard() {
     for (var i = 0; i < this.squares.length; i++) {
@@ -104,40 +117,75 @@ class MemoryGame {
       this.msgTimer.textContent = this.count.toString();
       if (this.count < 1) {
         clearInterval(clock);
-        alert("Lose game! Game over");
+        this.gameOver();
       }
     }
   }
-}
-function makeTable(cols, rows) {
-  const table = document.createElement("table");
-  const tbody = document.createElement("tbody");
-  table.setAttribute("role", "grid");
-  tbody.setAttribute("role", "rowgroup");
-  let row;
-  let count = 1;
+  makeBoard() {
+    const table = document.createElement("table");
+    const tbody = document.createElement("tbody");
+    table.setAttribute("role", "grid");
+    tbody.setAttribute("role", "rowgroup");
+    let row;
+    let count = 1;
 
-  for (let i = 0; i < rows; i++) {
-    row = tbody.insertRow(i);
-    row.setAttribute("data-row", i);
-    row.setAttribute("role", "row");
+    for (let i = 0; i < this.rows; i++) {
+      row = tbody.insertRow(i);
+      row.setAttribute("data-row", i);
+      row.setAttribute("role", "row");
 
-    for (let j = 0; j < cols; j++) {
-      let cell = document.createElement("td");
-      cell.setAttribute("data-col", j);
-      cell.setAttribute("role", "gridcell");
-      let button = document.createElement("button");
-      let span = document.createElement("span");
-      button.textContent = count++;
-      button.appendChild(span);
-      cell.appendChild(button);
-      tbody.rows[i].appendChild(cell);
+      for (let j = 0; j < this.cols; j++) {
+        let cell = document.createElement("td");
+        cell.setAttribute("data-col", j);
+        cell.setAttribute("role", "gridcell");
+        let button = document.createElement("button");
+        let span = document.createElement("span");
+        button.textContent = count++;
+        button.appendChild(span);
+        cell.appendChild(button);
+        tbody.rows[i].appendChild(cell);
+      }
     }
+    table.appendChild(tbody);
+    return table;
   }
-  table.appendChild(tbody);
-  return table;
+  setBoard() {
+    this.game.appendChild(this.makeBoard());
+  }
+  gameOver() {
+    this.lockBoard = true;
+    alert("game over" + this.lockBoard);
+  }
 }
-document.getElementById("game").appendChild(makeTable(4, 4));
+// function makeTable(cols, rows) {
+//   const table = document.createElement("table");
+//   const tbody = document.createElement("tbody");
+//   table.setAttribute("role", "grid");
+//   tbody.setAttribute("role", "rowgroup");
+//   let row;
+//   let count = 1;
+
+//   for (let i = 0; i < rows; i++) {
+//     row = tbody.insertRow(i);
+//     row.setAttribute("data-row", i);
+//     row.setAttribute("role", "row");
+
+//     for (let j = 0; j < cols; j++) {
+//       let cell = document.createElement("td");
+//       cell.setAttribute("data-col", j);
+//       cell.setAttribute("role", "gridcell");
+//       let button = document.createElement("button");
+//       let span = document.createElement("span");
+//       button.textContent = count++;
+//       button.appendChild(span);
+//       cell.appendChild(button);
+//       tbody.rows[i].appendChild(cell);
+//     }
+//   }
+//   table.appendChild(tbody);
+//   return table;
+// }
+// document.getElementById("game").appendChild(makeTable(4, 4));
 
 const data = [
   { name: "blue", img: "\u2663" },
@@ -157,11 +205,11 @@ const data = [
   { name: "purple", img: "\u272E" },
   { name: "purple", img: "\u272E" },
 ];
-function memoryGame(config) {
-  const game = new MemoryGame();
-  game.start(config);
-}
+function memoryGame() {
+  const game = new MemoryGame(4, 4, "game");
 
-document
-  .getElementById("reset")
-  .addEventListener("click", () => memoryGame({ squares: data, time: 25 }));
+  document
+    .getElementById("reset")
+    .addEventListener("click", () => game.start({ squares: data, time: 15 }));
+}
+memoryGame();
