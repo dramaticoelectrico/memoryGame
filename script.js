@@ -4,7 +4,13 @@ class MemoryGame {
     this.rows = rows;
     this.game = document.getElementById(boardId);
     this.selection = [];
-    this.correct = [];
+    this.matches = [];
+    this.ALERT = {
+      ERROR: "No match!",
+      SUCCESS: "Match!",
+      LOSE: "You Lose! Tuff luck.",
+      WIN: "You Win! Now try again.",
+    };
     this.lockBoard = false;
 
     this.setBoard();
@@ -12,8 +18,11 @@ class MemoryGame {
     this.msgTimer = document.getElementById("timer");
     this.msgAttempts = document.getElementById("attempts");
     this.msgAlert = document.getElementById("messages");
+    this.msgMatches = document.getElementById("matches");
     this.buttons = this.game.querySelectorAll("button");
     this.handler = this.handlerClick.bind(this);
+    this.promptTimer = null;
+    this.showHintTimer = null;
   }
   start(options) {
     this.reset();
@@ -30,6 +39,7 @@ class MemoryGame {
     this.buttons.forEach((button) => {
       button.removeAttribute("id");
       button.removeAttribute("data-name");
+      button.removeAttribute("tabindex");
       button.removeAttribute("class");
       button.removeAttribute("disabled");
       button.removeEventListener("click", this.handler);
@@ -39,7 +49,10 @@ class MemoryGame {
     this.count = 0;
     this.lockBoard = false;
     this.selection = [];
-    this.correct = [];
+    this.matches = [];
+    this.msgAlert.textContent = "";
+    this.msgAttempts.textContent = "0";
+    this.msgMatches.textContent = "0";
   }
   addCards() {
     this.buttons.forEach((button, i) => {
@@ -53,8 +66,20 @@ class MemoryGame {
     if (this.lockBoard) return;
     const parent = e.currentTarget;
     parent.setAttribute("class", "active");
+    parent.setAttribute("disabled", "true");
     this.selection.push({ id: parent.id, name: parent.dataset.name });
     this.checkMatch();
+  }
+  prompt(status) {
+    this.msgAlert.classList.add(status.toLowerCase());
+    this.msgAlert.textContent = this.ALERT[status];
+
+    if (status === "LOSE" || status === "WIN") return;
+
+    this.promptTimer = setTimeout(() => {
+      this.msgAlert.textContent = "";
+      this.msgAlert.classList.remove(status.toLowerCase());
+    }, 1000);
   }
   checkMatch() {
     if (this.selection.length === 2) {
@@ -70,34 +95,47 @@ class MemoryGame {
     let el;
     for (let item of this.selection) {
       el = document.getElementById(item.id);
-      el.setAttribute("disabled", "true");
-      el.removeEventListener("click", this.handlerClick);
+      el.setAttribute("tabindex", "-1");
+      el.classList.add("match");
     }
-    this.correct.push(this.selection[0], this.selection[1]);
+    this.prompt("SUCCESS");
+    this.matches.push(this.selection[0], this.selection[1]);
+    this.msgMatches.textContent = String(this.matches.length / 2);
     this.selection.length = 0;
-    if (this.correct.length === this.squares.length) {
+    if (this.matches.length === this.squares.length) {
       this.winner();
     }
   }
   lose() {
     this.lockBoard = true;
     let el;
-
+    this.prompt("ERROR");
     for (let item of this.selection) {
       el = document.getElementById(item.id);
       el.classList.add("failed");
     }
-    setTimeout(() => {
-      this.lockBoard = false;
+    this.showHintTimer = setTimeout(() => {
       for (let item of this.selection) {
         el = document.getElementById(item.id);
         el.removeAttribute("class");
+        el.removeAttribute("disabled");
       }
       this.selection.length = 0;
+      this.lockBoard = false;
     }, 1000);
   }
   winner() {
-    alert("Game won");
+    this.prompt("WIN");
+  }
+  flipBoard() {
+    this.buttons.forEach((button) => {
+      if (!button.getAttribute("class")) {
+        button.setAttribute("class", "active failed");
+      } else if (!(button.getAttribute("class").indexOf("match") > -1)) {
+        button.removeAttribute("class");
+        button.setAttribute("class", "active failed");
+      }
+    });
   }
   shuffleBoard() {
     for (var i = 0; i < this.squares.length; i++) {
@@ -154,38 +192,12 @@ class MemoryGame {
   }
   gameOver() {
     this.lockBoard = true;
-    alert("game over" + this.lockBoard);
+    this.prompt("LOSE");
+    clearTimeout(this.promptTimer);
+    clearTimeout(this.showHintTimer);
+    setTimeout(this.flipBoard(), 500);
   }
 }
-// function makeTable(cols, rows) {
-//   const table = document.createElement("table");
-//   const tbody = document.createElement("tbody");
-//   table.setAttribute("role", "grid");
-//   tbody.setAttribute("role", "rowgroup");
-//   let row;
-//   let count = 1;
-
-//   for (let i = 0; i < rows; i++) {
-//     row = tbody.insertRow(i);
-//     row.setAttribute("data-row", i);
-//     row.setAttribute("role", "row");
-
-//     for (let j = 0; j < cols; j++) {
-//       let cell = document.createElement("td");
-//       cell.setAttribute("data-col", j);
-//       cell.setAttribute("role", "gridcell");
-//       let button = document.createElement("button");
-//       let span = document.createElement("span");
-//       button.textContent = count++;
-//       button.appendChild(span);
-//       cell.appendChild(button);
-//       tbody.rows[i].appendChild(cell);
-//     }
-//   }
-//   table.appendChild(tbody);
-//   return table;
-// }
-// document.getElementById("game").appendChild(makeTable(4, 4));
 
 const data = [
   { name: "blue", img: "\u2663" },

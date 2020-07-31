@@ -20,14 +20,30 @@ p {
   font-size: 1.3rem;
   font-family: Georgia, "Times New Roman", Times, serif;
 }
+.error,
+.lose {
+  color: rgb(255, 0, 0);
+}
+.success,
+.win {
+  color: rgb(42, 175, 42);
+}
 .reset {
   color: #fff;
   background-color: rgb(25, 170, 5);
+}
+.messages {
+  text-align: center;
+  min-height: 1.5rem;
+  font-weight: 700;
 }
 button {
   outline: 1px solid #666;
   box-shadow: none;
   border: 2px solid transparent;
+}
+button[disabled] {
+  color: rgb(0, 0, 0);
 }
 button:focus {
   border-color: rgb(44, 226, 217);
@@ -62,6 +78,9 @@ button:focus {
 }
 .game-board button.active {
   border-color: rgb(87, 233, 87);
+}
+.game-board button.match {
+  color: rgb(87, 233, 87);
 }
 .game-board button.active.failed,
 .game-board button.active.failed:focus {
