@@ -21,6 +21,8 @@ class MemoryGame {
     this.msgMatches = document.getElementById("matches");
     this.buttons = this.game.querySelectorAll("button");
     this.handler = this.handlerClick.bind(this);
+    this.keyHandler = this.handleKeypress.bind(this);
+    this.game.addEventListener("keydown", this.handleKeypress);
     this.promptTimer = null;
     this.showHintTimer = null;
   }
@@ -69,6 +71,56 @@ class MemoryGame {
     parent.setAttribute("disabled", "true");
     this.selection.push({ id: parent.id, name: parent.dataset.name });
     this.checkMatch();
+  }
+  handleKeypress(e) {
+    let el, row, col;
+    switch (e.code) {
+      case "ArrowDown":
+        col = e.target.parentNode.dataset.col;
+        row = +e.target.parentNode.parentNode.dataset.row + 1;
+
+        console.log("move down", col, row);
+        el = document.querySelector(`[data-row="${row}"] [data-col="${col}"]`);
+        if (!el) return false;
+        if (el) {
+          el.firstChild.focus();
+        }
+
+        break;
+      case "ArrowUp":
+        console.log("move up");
+        break;
+      case "ArrowRight":
+        el = document.querySelector(
+          `[data-col="${+e.target.parentNode.dataset.col + 1}"]`
+        );
+        if (!el) return false;
+        if (el) {
+          el.firstChild.focus();
+        }
+        break;
+      case "ArrowLeft":
+        el = document.querySelector(
+          `[data-col="${+e.target.parentNode.dataset.col - 1}"]`
+        );
+        if (!el) return false;
+        if (el) {
+          el.firstChild.focus();
+        }
+        console.log("move left");
+        break;
+      case "Escape":
+        console.log("Esc");
+        break;
+      case "Tab":
+        el = document.querySelector(
+          `[data-col="${e.target.parentNode.dataset.col}"]`
+        );
+        console.log("tab keys", el);
+        break;
+      default:
+        console.log("default");
+    }
   }
   prompt(status) {
     this.msgAlert.classList.add(status.toLowerCase());
