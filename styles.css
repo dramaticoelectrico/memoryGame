@@ -28,6 +28,10 @@ p {
 .win {
   color: rgb(42, 175, 42);
 }
+.stop {
+  color: #fff;
+  background-color: rgb(250, 172, 28);
+}
 .reset {
   color: #fff;
   background-color: rgb(25, 170, 5);

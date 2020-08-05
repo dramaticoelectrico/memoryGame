@@ -11,7 +11,7 @@ class MemoryGame {
       LOSE: "You Lose! Tuff luck.",
       WIN: "You Win! Now try again.",
     };
-    this.lockBoard = false;
+    this.lockBoard = true;
 
     this.setBoard();
 
@@ -20,13 +20,17 @@ class MemoryGame {
     this.msgAlert = document.getElementById("messages");
     this.msgMatches = document.getElementById("matches");
     this.buttons = this.game.querySelectorAll("button");
+
     this.handler = this.handlerClick.bind(this);
     this.keyHandler = this.handleKeypress.bind(this);
-    this.game.addEventListener("keydown", this.handleKeypress);
+
+    this.game.addEventListener("keydown", this.keyHandler);
     this.promptTimer = null;
     this.showHintTimer = null;
+    this.countDownClock = null;
   }
-  start(options) {
+  newGame(options) {
+    // New Game btn
     this.reset();
     this.squares = options.squares;
     this.count = options.time;
@@ -35,7 +39,13 @@ class MemoryGame {
     this.msgTimer.textContent = this.count;
     this.shuffleBoard();
     this.addCards();
+  }
+  startGame() {
+    // Start btn
+    this.buttons[0].focus();
+    this.lockBoard = false;
     this.timer();
+    console.log("GAME BEGINS - disable button");
   }
   reset() {
     this.buttons.forEach((button) => {
@@ -43,18 +53,20 @@ class MemoryGame {
       button.removeAttribute("data-name");
       button.removeAttribute("tabindex");
       button.removeAttribute("class");
-      button.removeAttribute("disabled");
       button.removeEventListener("click", this.handler);
       button.firstElementChild.textContent = "";
     });
     this.squares = [];
     this.count = 0;
-    this.lockBoard = false;
+    this.lockBoard = true;
     this.selection = [];
     this.matches = [];
     this.msgAlert.textContent = "";
     this.msgAttempts.textContent = "0";
     this.msgMatches.textContent = "0";
+    clearTimeout(this.promptTimer);
+    clearTimeout(this.showHintTimer);
+    clearInterval(this.countDownClock);
   }
   addCards() {
     this.buttons.forEach((button, i) => {
@@ -67,59 +79,52 @@ class MemoryGame {
   handlerClick(e) {
     if (this.lockBoard) return;
     const parent = e.currentTarget;
+    if (e.currentTarget.getAttribute("class") === "active") {
+      return;
+    }
     parent.setAttribute("class", "active");
-    parent.setAttribute("disabled", "true");
     this.selection.push({ id: parent.id, name: parent.dataset.name });
     this.checkMatch();
   }
+  getNextSquare(col, row) {
+    let el = document.querySelector(`[data-row="${row}"] [data-col="${col}"]`);
+    return el ? el.firstChild.focus() : false;
+  }
   handleKeypress(e) {
-    let el, row, col;
+    let row, col;
     switch (e.code) {
       case "ArrowDown":
         col = e.target.parentNode.dataset.col;
-        row = +e.target.parentNode.parentNode.dataset.row + 1;
+        row = parseInt(e.target.parentNode.parentNode.dataset.row) + 1;
 
-        console.log("move down", col, row);
-        el = document.querySelector(`[data-row="${row}"] [data-col="${col}"]`);
-        if (!el) return false;
-        if (el) {
-          el.firstChild.focus();
-        }
-
+        this.getNextSquare(col, row);
         break;
       case "ArrowUp":
-        console.log("move up");
+        col = e.target.parentNode.dataset.col;
+        row = parseInt(e.target.parentNode.parentNode.dataset.row) - 1;
+
+        this.getNextSquare(col, row);
         break;
       case "ArrowRight":
-        el = document.querySelector(
-          `[data-col="${+e.target.parentNode.dataset.col + 1}"]`
-        );
-        if (!el) return false;
-        if (el) {
-          el.firstChild.focus();
-        }
+        col = parseInt(e.target.parentNode.dataset.col) + 1;
+        row = e.target.parentNode.parentNode.dataset.row;
+
+        this.getNextSquare(col, row);
         break;
       case "ArrowLeft":
-        el = document.querySelector(
-          `[data-col="${+e.target.parentNode.dataset.col - 1}"]`
-        );
-        if (!el) return false;
-        if (el) {
-          el.firstChild.focus();
-        }
-        console.log("move left");
+        col = parseInt(e.target.parentNode.dataset.col) - 1;
+        row = e.target.parentNode.parentNode.dataset.row;
+
+        this.getNextSquare(col, row);
         break;
       case "Escape":
-        console.log("Esc");
+        console.log("Esc freeze game");
         break;
       case "Tab":
-        el = document.querySelector(
-          `[data-col="${e.target.parentNode.dataset.col}"]`
-        );
-        console.log("tab keys", el);
+        console.log("tab keys");
         break;
       default:
-        console.log("default");
+        return false;
     }
   }
   prompt(status) {
@@ -138,12 +143,11 @@ class MemoryGame {
       this.attempts++;
       this.msgAttempts.textContent = this.attempts;
       this.selection[0].name === this.selection[1].name
-        ? this.scored()
-        : this.lose();
+        ? this.match()
+        : this.noMatch();
     }
   }
-  scored() {
-    // update
+  match() {
     let el;
     for (let item of this.selection) {
       el = document.getElementById(item.id);
@@ -158,7 +162,7 @@ class MemoryGame {
       this.winner();
     }
   }
-  lose() {
+  noMatch() {
     this.lockBoard = true;
     let el;
     this.prompt("ERROR");
@@ -170,7 +174,6 @@ class MemoryGame {
       for (let item of this.selection) {
         el = document.getElementById(item.id);
         el.removeAttribute("class");
-        el.removeAttribute("disabled");
       }
       this.selection.length = 0;
       this.lockBoard = false;
@@ -201,15 +204,22 @@ class MemoryGame {
   }
   timer() {
     this.msgTimer.textContent = this.count.toString();
-    const clock = setInterval(doCountDown.bind(this), 1000);
+    this.countDownClock = setInterval(doCountDown.bind(this), 1000);
     function doCountDown() {
       this.count--;
       this.msgTimer.textContent = this.count.toString();
       if (this.count < 1) {
-        clearInterval(clock);
+        clearInterval(this.countDownClock);
         this.gameOver();
       }
     }
+  }
+  gameOver() {
+    this.lockBoard = true;
+    clearTimeout(this.promptTimer);
+    clearTimeout(this.showHintTimer);
+    this.prompt("LOSE");
+    setTimeout(this.flipBoard(), 500);
   }
   makeBoard() {
     const table = document.createElement("table");
@@ -242,13 +252,6 @@ class MemoryGame {
   setBoard() {
     this.game.appendChild(this.makeBoard());
   }
-  gameOver() {
-    this.lockBoard = true;
-    this.prompt("LOSE");
-    clearTimeout(this.promptTimer);
-    clearTimeout(this.showHintTimer);
-    setTimeout(this.flipBoard(), 500);
-  }
 }
 
 const data = [
@@ -274,6 +277,9 @@ function memoryGame() {
 
   document
     .getElementById("reset")
-    .addEventListener("click", () => game.start({ squares: data, time: 15 }));
+    .addEventListener("click", () => game.newGame({ squares: data, time: 15 }));
+  document
+    .getElementById("start")
+    .addEventListener("click", () => game.startGame());
 }
 memoryGame();
