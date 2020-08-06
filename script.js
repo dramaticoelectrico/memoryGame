@@ -1,10 +1,11 @@
 class MemoryGame {
   constructor(cols, rows, boardId) {
+    // tables
     this.cols = cols;
     this.rows = rows;
     this.game = document.getElementById(boardId);
-    this.selection = [];
-    this.matches = [];
+    this.setBoard();
+
     this.ALERT = {
       ERROR: "No match!",
       SUCCESS: "Match!",
@@ -13,12 +14,12 @@ class MemoryGame {
     };
     this.lockBoard = true;
 
-    this.setBoard();
-
     this.msgTimer = document.getElementById("timer");
     this.msgAttempts = document.getElementById("attempts");
     this.msgAlert = document.getElementById("messages");
     this.msgMatches = document.getElementById("matches");
+    this.startBtn = document.getElementById("start");
+    this.resetBtn = document.getElementById("reset");
     this.buttons = this.game.querySelectorAll("button");
 
     this.handler = this.handlerClick.bind(this);
@@ -39,6 +40,7 @@ class MemoryGame {
     this.msgTimer.textContent = this.count;
     this.shuffleBoard();
     this.addCards();
+    this.startBtn.focus();
   }
   startGame() {
     // Start btn
@@ -128,14 +130,14 @@ class MemoryGame {
     }
   }
   prompt(status) {
-    this.msgAlert.classList.add(status.toLowerCase());
+    this.msgAlert.setAttribute("data-prompt", status.toLowerCase());
     this.msgAlert.textContent = this.ALERT[status];
 
     if (status === "LOSE" || status === "WIN") return;
 
     this.promptTimer = setTimeout(() => {
       this.msgAlert.textContent = "";
-      this.msgAlert.classList.remove(status.toLowerCase());
+      this.msgAlert.removeAttribute("data-prompt");
     }, 1000);
   }
   checkMatch() {
@@ -220,6 +222,7 @@ class MemoryGame {
     clearTimeout(this.showHintTimer);
     this.prompt("LOSE");
     setTimeout(this.flipBoard(), 500);
+    this.resetBtn.focus();
   }
   makeBoard() {
     const table = document.createElement("table");

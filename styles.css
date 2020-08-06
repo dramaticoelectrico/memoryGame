@@ -20,14 +20,15 @@ p {
   font-size: 1.3rem;
   font-family: Georgia, "Times New Roman", Times, serif;
 }
-.error,
-.lose {
+[data-prompt="error"],
+[data-prompt="lose"] {
   color: rgb(255, 0, 0);
 }
-.success,
-.win {
+[data-prompt="success"],
+[data-prompt="win"] {
   color: rgb(42, 175, 42);
 }
+
 .stop {
   color: #fff;
   background-color: rgb(250, 172, 28);
