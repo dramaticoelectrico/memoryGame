@@ -40,13 +40,17 @@ class MemoryGame {
     this.msgTimer.textContent = this.count;
     this.shuffleBoard();
     this.addCards();
+    this.resetBtn.setAttribute("disabled", "true");
+    this.startBtn.removeAttribute("disabled");
     this.startBtn.focus();
   }
   startGame() {
     // Start btn
     this.buttons[0].focus();
     this.lockBoard = false;
+    this.resetBtn.removeAttribute("disabled");
     this.timer();
+    this.startBtn.setAttribute("disabled", "true");
     console.log("GAME BEGINS - disable button");
   }
   reset() {
@@ -277,7 +281,7 @@ const data = [
 ];
 function memoryGame() {
   const game = new MemoryGame(4, 4, "game");
-
+  game.newGame({ squares: data, time: 15 });
   document
     .getElementById("reset")
     .addEventListener("click", () => game.newGame({ squares: data, time: 15 }));
