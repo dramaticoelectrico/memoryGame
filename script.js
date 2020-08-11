@@ -22,7 +22,7 @@ class MemoryGame {
     this.resetBtn = document.getElementById("reset");
     this.buttons = this.game.querySelectorAll("button");
 
-    this.handler = this.handlerClick.bind(this);
+    this.clickHandler = this.handleClick.bind(this);
     this.keyHandler = this.handleKeypress.bind(this);
 
     this.game.addEventListener("keydown", this.keyHandler);
@@ -59,7 +59,7 @@ class MemoryGame {
       button.removeAttribute("data-name");
       button.removeAttribute("tabindex");
       button.removeAttribute("class");
-      button.removeEventListener("click", this.handler);
+      button.removeEventListener("click", this.clickHandler);
       button.firstElementChild.textContent = "";
     });
     this.squares = [];
@@ -78,11 +78,11 @@ class MemoryGame {
     this.buttons.forEach((button, i) => {
       button.dataset.name = this.squares[i].name;
       button.setAttribute("id", "item-" + i);
-      button.addEventListener("click", this.handler);
+      button.addEventListener("click", this.clickHandler);
       button.firstElementChild.append(this.squares[i].img);
     });
   }
-  handlerClick(e) {
+  handleClick(e) {
     if (this.lockBoard) return;
     const parent = e.currentTarget;
     if (e.currentTarget.getAttribute("class") === "active") {
@@ -92,7 +92,7 @@ class MemoryGame {
     this.selection.push({ id: parent.id, name: parent.dataset.name });
     this.checkMatch();
   }
-  getNextSquare(col, row) {
+  arrowKeyMove(col, row) {
     let el = document.querySelector(`[data-row="${row}"] [data-col="${col}"]`);
     return el ? el.firstChild.focus() : false;
   }
@@ -103,25 +103,25 @@ class MemoryGame {
         col = e.target.parentNode.dataset.col;
         row = parseInt(e.target.parentNode.parentNode.dataset.row) + 1;
 
-        this.getNextSquare(col, row);
+        this.arrowKeyMove(col, row);
         break;
       case "ArrowUp":
         col = e.target.parentNode.dataset.col;
         row = parseInt(e.target.parentNode.parentNode.dataset.row) - 1;
 
-        this.getNextSquare(col, row);
+        this.arrowKeyMove(col, row);
         break;
       case "ArrowRight":
         col = parseInt(e.target.parentNode.dataset.col) + 1;
         row = e.target.parentNode.parentNode.dataset.row;
 
-        this.getNextSquare(col, row);
+        this.arrowKeyMove(col, row);
         break;
       case "ArrowLeft":
         col = parseInt(e.target.parentNode.dataset.col) - 1;
         row = e.target.parentNode.parentNode.dataset.row;
 
-        this.getNextSquare(col, row);
+        this.arrowKeyMove(col, row);
         break;
       case "Escape":
         console.log("Esc freeze game");

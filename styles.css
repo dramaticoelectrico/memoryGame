@@ -1,8 +1,10 @@
+body,
+html {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
 .btn {
   padding: 0.5em 1em;
   font-size: 1.4rem;
-  font-family: Georgia, "Times New Roman", Times, serif;
-  font-style: italic;
   outline: none;
   cursor: pointer;
 }
@@ -15,10 +17,16 @@
   display: flex;
   justify-content: center;
 }
+.hint {
+  margin: 0.5rem auto;
+  padding: 0.3em;
+  text-align: center;
+  width: auto;
+  background-color: rgb(244, 244, 244);
+}
 p {
   font-weight: 400;
   font-size: 1.3rem;
-  font-family: Georgia, "Times New Roman", Times, serif;
 }
 [data-prompt="error"],
 [data-prompt="lose"] {
@@ -43,7 +51,7 @@ p {
 button {
   outline: 1px solid #666;
   box-shadow: none;
-  border: 2px solid transparent;
+  border: 3px solid transparent;
 }
 button[disabled] {
   color: rgb(0, 0, 0);
@@ -56,10 +64,11 @@ button.start[disabled] {
   opacity: 0.2;
 }
 button:focus {
-  border-color: rgb(44, 226, 217);
+  border-color: rgb(9, 247, 235);
 }
 .timer > span,
-.attempts > span {
+.attempts > span,
+.matches > span {
   font-weight: 700;
   display: inline-block;
   margin-left: 0.5em;
