@@ -13,7 +13,6 @@ class MemoryGame {
       WIN: "You Win! Now try again.",
     };
     this.lockBoard = true;
-
     this.msgTimer = document.getElementById("timer");
     this.msgAttempts = document.getElementById("attempts");
     this.msgAlert = document.getElementById("messages");

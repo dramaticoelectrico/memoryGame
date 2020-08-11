@@ -11,6 +11,13 @@
     "[css]": {
       "editor.formatOnSave": true
     },
-    "terminal.integrated.fontFamily": "Source Code Pro for Powerline"
+    "[html]": {
+      "editor.formatOnSave": true
+    },
+    "terminal.integrated.fontFamily": "Source Code Pro for Powerline",
+    "editor.codeActionsOnSave": {
+      "source.fixAll": true,
+      "source.fixAll.eslint": false
+    }
   }
   

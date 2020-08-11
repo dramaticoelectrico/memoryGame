@@ -1,26 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Memory Game</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <main>
-        <div class="controls" id="controls">
-            <p role="timer" class="timer">Time left:<span id="timer"></span></p>
-            <p class="attempts">Attempts:<span id="attempts"></span></p>
-            <p class="matches">Matches:<span id="matches"></span></p>
-            <p><button class="btn reset" id="reset">New Game</button></p>
-            <p><button class="btn start" id="start">Start!</button></p>
-        </div>
-        <p role="alert" describedby="instructions" class="messages" id="messages"></p>
-        <div role="region" class="game-board" id="game"></div>
-        <p id="instructions" class="hint">&#8727; use arrow keys, tab key to move around game board</p>
+      <div class="controls" id="controls">
+        <p role="timer" class="timer">Time left:<span id="timer"></span></p>
+        <p class="attempts">Attempts:<span id="attempts"></span></p>
+        <p class="matches">Matches:<span id="matches"></span></p>
+        <p><button class="btn reset" id="reset">New Game</button></p>
+        <p><button class="btn start" id="start">Start!</button></p>
+      </div>
+      <p
+        role="alert"
+        describedby="instructions"
+        class="messages"
+        id="messages"
+      ></p>
+      <div role="region" class="game-board" id="game"></div>
+      <p id="instructions" class="hint">
+        &#8727; use arrow keys, tab key to move around game board
+      </p>
     </main>
-    
+
     <script src="script.js"></script>
     <script></script>
-</body>
+  </body>
 </html>
